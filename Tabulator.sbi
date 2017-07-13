@@ -1,0 +1,144 @@
+﻿
+; http://olifolkerd.github.io/tabulator/
+
+DeclareModule Tabulator
+	
+	Enumeration
+		
+		; Set- / GetGadgetAttribute
+		
+		#TabulatorData
+		#TabulatorColumns
+		; #TabulatorOptions
+		
+	EndEnumeration
+	
+; 	Structure sTabulatorColumn
+; 		title.s            ; Required This is the title that will be displayed in the header for this column
+; 		field.s						 ; Required (not required in icon/button columns) this is the key for this column in the data array
+; 		align.s						 ; sets the text alignment for this column (left|center|right)
+; 		width.i						 ; sets the width of this column, this can be set in pixels or as a percentage of total table width (if not set the system will determine the best)
+; 		minWidth.i				 ; sets the minimum width of this column, this should be set in pixels (this takes priority over the global option of colMinWidth)
+; 		frozen.i					 ; freezes the column in place when scrolling (see Frozen Columns for more details)
+; 		responsive.i			 ; an integer to determine when the column should be hidden in responsive mode (see Responsive Layout for more details)
+; 		sortable.i				 ; determines if the user can sort data by this column (see Sorting Data for more details)
+; 		sorter.i					 ; determines how to sort data in this column (see Sorting Data for more details)
+; 		formatter.i				 ; set how you would like the data to be formatted (see Formatting Data for more details)
+; 		onClick.i					 ; callback for when user clicks on a cell in this column (see Callbacks for more details)
+; 		onDblClick.i			 ; callback for when user double clicks on a cell in this column (see Callbacks for more details)
+; 		onContext.i				 ; callback for when user right clicks on a cell in this column (see Callbacks for more details)
+; 		editable.i				 ; (boolean, default ; false) determines if this data is editable by the user. will use the editor that matches the formatter by default. (see Manipulating Data for more details)
+; 		editor.i					 ; set the editor to be used when editing the data. (see Manipulating Data for more details)
+; 		visible.i					 ; (boolean, default ; true) determines if the column is visible. (see Column Visibility for more details)
+; 		cssClass.i				 ; sets css classes on header and cells in this column. (value should be a string containing space seperated class names)
+; 		tooltip.i					 ; sets the on hover tooltip for each cell in this column (see Formatting Data for more details)
+; 		tooltipHeader.i		 ; sets the on hover tooltip for the column header (see Formatting Data for more details)
+; 		editableTitle.i		 ; allows the user to edit the header titles. (see Editable Column Titles for more details)
+; 		headerFilter.i		 ; filtering of columns from elements in the header (see Header Filtering for more details)
+; 		mutator.i					 ; function for manipulating column values as they are parsed into the table (see Mutators for more details)
+; 		mutateType.i			 ; defines whether mutation should occur on data parsing, cell editing or both (see Mutators for more details)
+; 		accessor.i				 ; function to alter column values before they are read out the table using the getData function (see Accessors for more details)		
+; 	EndStructure  
+	
+	#Style_Tabulator          = "tabulator.min.css"
+	#Style_Tabulator_Midnight = "tabulator_midnight.min.css"
+	#Style_Tabulator_Modern   = "tabulator_modern.min.css"
+	#Style_Tabulator_Simple   = "tabulator_simple.min.css"
+	#Style_Tabulator_Site     = "tabulator_site.min.css"
+	#Style_Bootstrap          = "bootstrap/tabulator_bootstrap.min.css"
+	#Style_SemanticUI         = "semantic-ui/tabulator_semantic-ui.min.css"
+	
+	Global IsInitialized
+	
+	Declare Init(Callback, Style.s = #Style_Tabulator)
+	Declare BindGadget(Gadget, Options)
+	Declare SetAttribute(Gadget, Attribute, Value)
+	Declare ClearItems(Gadget)
+	Declare Redraw(Gadget)
+	
+EndDeclareModule
+
+Module Tabulator
+	
+	Macro GetSelector
+		!	var selector = $(spider_GadgetID(v_gadget).div).find('.dijitContentPane');
+	EndMacro
+	
+	Procedure Init(Callback, Style.s = #Style_Tabulator)
+		
+		! $('<link rel="stylesheet" type="text/css">').attr('href','resources/tabulator/css/' + v_style).appendTo('head');
+		
+		; Other styles: take a lot into resources\tabulator\css
+		
+		! require(["./resources/tabulator/js/jquery-ui.min.js"], function() { 
+		!   require(["./resources/tabulator/js/tabulator.min.js"], function() {
+		
+		IsInitialized = #True
+		
+    ! $.widget("ui.tabulator", $.ui.tabulator, {
+    !     options: {
+    !         resizableColumns:true,
+    !         height: '100%'
+    !     },
+    ! });		
+		
+		!     v_callback();
+		!   });
+		! });
+		
+		
+	EndProcedure  
+	
+	Procedure BindGadget(Gadget, Options)
+	  
+		GetSelector
+		
+		! selector.tabulator(v_options);
+		
+		Redraw(Gadget)
+	  
+	EndProcedure
+	
+	Procedure SetAttribute(Gadget, Attribute, Value)
+	  
+	  GetSelector
+	  
+	  Select Attribute
+	      
+	    Case #TabulatorData
+	      ! selector.tabulator("setData", v_value);
+	      
+	    Case #TabulatorColumns
+	      ! selector.tabulator("setColumns", v_value);
+	      
+	      ;	Case #TabulatorOptions
+        ;		! var oldOptions = selector.tabulator("option");
+        ;		! var newOptions = {};
+        ;		! $.extend(true, newOptions, oldOptions, v_value) 
+        ;		! selector.tabulator("option", newOptions);
+	      
+	  EndSelect
+	  
+	  Redraw(Gadget)
+	  
+	EndProcedure
+	
+	Procedure ClearItems(Gadget)
+		
+		GetSelector
+		
+		! selector.tabulator("clear");
+		
+		Redraw(Gadget)
+		
+	EndProcedure
+	
+	Procedure Redraw(Gadget)
+		
+		GetSelector
+		
+		! selector.tabulator("redraw", true);    
+		
+	EndProcedure
+	
+EndModule
