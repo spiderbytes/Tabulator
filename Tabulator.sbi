@@ -53,6 +53,7 @@ DeclareModule Tabulator
 	Declare Init(Callback, Style.s = #Style_Tabulator)
 	Declare BindGadget(Gadget, Options)
 	Declare SetAttribute(Gadget, Attribute, Value)
+	Declare GetAttribute(Gadget, Attribute)
 	Declare ClearItems(Gadget)
 	Declare Redraw(Gadget)
 	
@@ -122,6 +123,22 @@ Module Tabulator
 	  Redraw(Gadget)
 	  
 	EndProcedure
+	
+	Procedure GetAttribute(Gadget, Attribute)
+	  
+	  GetSelector
+	  
+	  Select Attribute
+	      
+	    Case #TabulatorData
+	      ! return selector.tabulator("getData");
+	      
+	    Case #TabulatorColumns
+	      ! return selector.tabulator("getColumns");
+	      
+	  EndSelect
+	  
+	EndProcedure	
 	
 	Procedure ClearItems(Gadget)
 		
