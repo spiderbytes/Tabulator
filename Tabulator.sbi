@@ -2,160 +2,1475 @@
 ; http://olifolkerd.github.io/tabulator/
 
 DeclareModule Tabulator
-	
-	Enumeration
-		
-		; Set- / GetGadgetAttribute
-		
-		#TabulatorData
-		#TabulatorColumns
-		; #TabulatorOptions
-		
-	EndEnumeration
-	
-; 	Structure sTabulatorColumn
-; 		title.s            ; Required This is the title that will be displayed in the header for this column
-; 		field.s						 ; Required (not required in icon/button columns) this is the key for this column in the data array
-; 		align.s						 ; sets the text alignment for this column (left|center|right)
-; 		width.i						 ; sets the width of this column, this can be set in pixels or as a percentage of total table width (if not set the system will determine the best)
-; 		minWidth.i				 ; sets the minimum width of this column, this should be set in pixels (this takes priority over the global option of colMinWidth)
-; 		frozen.i					 ; freezes the column in place when scrolling (see Frozen Columns for more details)
-; 		responsive.i			 ; an integer to determine when the column should be hidden in responsive mode (see Responsive Layout for more details)
-; 		sortable.i				 ; determines if the user can sort data by this column (see Sorting Data for more details)
-; 		sorter.i					 ; determines how to sort data in this column (see Sorting Data for more details)
-; 		formatter.i				 ; set how you would like the data to be formatted (see Formatting Data for more details)
-; 		onClick.i					 ; callback for when user clicks on a cell in this column (see Callbacks for more details)
-; 		onDblClick.i			 ; callback for when user double clicks on a cell in this column (see Callbacks for more details)
-; 		onContext.i				 ; callback for when user right clicks on a cell in this column (see Callbacks for more details)
-; 		editable.i				 ; (boolean, default ; false) determines if this data is editable by the user. will use the editor that matches the formatter by default. (see Manipulating Data for more details)
-; 		editor.i					 ; set the editor to be used when editing the data. (see Manipulating Data for more details)
-; 		visible.i					 ; (boolean, default ; true) determines if the column is visible. (see Column Visibility for more details)
-; 		cssClass.i				 ; sets css classes on header and cells in this column. (value should be a string containing space seperated class names)
-; 		tooltip.i					 ; sets the on hover tooltip for each cell in this column (see Formatting Data for more details)
-; 		tooltipHeader.i		 ; sets the on hover tooltip for the column header (see Formatting Data for more details)
-; 		editableTitle.i		 ; allows the user to edit the header titles. (see Editable Column Titles for more details)
-; 		headerFilter.i		 ; filtering of columns from elements in the header (see Header Filtering for more details)
-; 		mutator.i					 ; function for manipulating column values as they are parsed into the table (see Mutators for more details)
-; 		mutateType.i			 ; defines whether mutation should occur on data parsing, cell editing or both (see Mutators for more details)
-; 		accessor.i				 ; function to alter column values before they are read out the table using the getData function (see Accessors for more details)		
-; 	EndStructure  
-	
-	#Style_Tabulator          = "tabulator.min.css"
-	#Style_Tabulator_Midnight = "tabulator_midnight.min.css"
-	#Style_Tabulator_Modern   = "tabulator_modern.min.css"
-	#Style_Tabulator_Simple   = "tabulator_simple.min.css"
-	#Style_Tabulator_Site     = "tabulator_site.min.css"
-	#Style_Bootstrap          = "bootstrap/tabulator_bootstrap.min.css"
-	#Style_SemanticUI         = "semantic-ui/tabulator_semantic-ui.min.css"
-	
-	Global IsInitialized
-	
-	Declare Init(Callback, Style.s = #Style_Tabulator)
-	Declare BindGadget(Gadget, Options)
-	Declare SetAttribute(Gadget, Attribute, Value)
-	Declare GetAttribute(Gadget, Attribute)
-	Declare ClearItems(Gadget)
-	Declare Redraw(Gadget)
-	
+  
+  EnumerationBinary ; EventTypes
+    
+    ; #############################
+    ; Table Callbacks
+    ; #############################
+    
+    #EventType_TableBuilding = 1
+    #EventType_TableBuilt
+    
+    ; #############################
+    ; Column Callbacks
+    ; #############################
+    
+    #EventType_ColumnHeaderClick
+    #EventType_ColumnHeaderDoubleClick
+    #EventType_ColumnHeaderRightClick
+    #EventType_ColumnMoved
+    #EventType_ColumnResized
+    #EventType_ColumnVisibilityChanged
+    #EventType_ColumnTitleChanged
+    
+    ; #############################
+    ; Row Callbacks
+    ; #############################
+    
+    #EventType_RowClick
+    #EventType_RowDblClick
+    #EventType_RowContext
+    #EventType_RowAdded
+    #EventType_RowUpdated
+    #EventType_RowDeleted
+    #EventType_RowMoved
+    
+    ; #############################
+    ; Cell Callbacks
+    ; #############################
+    
+    #EventType_CellClick
+    #EventType_CellDoubleClick
+    #EventType_CellRightClick
+    #EventType_CellEditing
+    #EventType_CellEditCancelled
+    #EventType_CellEdited
+    
+    ; #############################
+    ; Data Callbacks
+    ; #############################
+    
+    #EventType_DataLoading
+    #EventType_DataLoaded
+    #EventType_DataEdited
+    #EventType_HTMLImporting
+    #EventType_HTMLImported
+    
+    ; #############################
+    ; Ajax Callbacks
+    ; #############################
+    
+    #EventType_AjaxRequest
+    #EventType_AjaxResponse
+    #EventType_AjaxError
+    
+    ; #############################
+    ; Filter Callbacks
+    ; #############################
+    
+    #EventType_DataFiltering
+    #EventType_DataFiltered
+    
+    ; #############################
+    ; Sorting Callbacks
+    ; #############################
+    
+    #EventType_DataSorting
+    #EventType_DataSorted
+    
+    ; #############################
+    ; Layout Callbacks
+    ; #############################
+    
+    #EventType_RenderStarted
+    #EventType_RenderComplete
+    
+    ; #############################
+    ; Pagination Callbacks
+    ; #############################
+    
+    #EventType_PageLoaded
+    
+    ; #############################
+    ; Localization Callbacks
+    ; #############################
+    
+    #EventType_TableLocalized
+    
+    ; #############################
+    ; Group Callbacks
+    ; #############################
+    
+    #EventType_DataGrouping
+    #EventType_DataGrouped
+    #EventType_GroupVisibilityChanged
+    
+    ; #############################
+    ; Selection Callbacks
+    ; #############################
+    
+    #EventType_RowSelected
+    #EventType_RowDeselected
+    #EventType_RowSelectionChanged
+    
+  EndEnumeration
+  
+  Enumeration ; Set- / GetGadgetAttribute
+    #TabulatorData
+    #TabulatorColumns
+    ; #TabulatorOptions
+  EndEnumeration
+  
+  Structure sColumn
+    
+    ; General
+    
+    ; title - Required This is the title that will be displayed in the header for this column
+    ; field - Required (not required in icon/button columns) this is the key for this column in the data array
+    ; visible - (boolean, default - true) determines if the column is visible. (see Column Visibility for more details)
+    
+    title.s
+    field.s
+    visible.i
+    
+    ; Layout
+    
+    ; align - sets the text alignment for this column (left|center|right)
+    ; width - sets the width of this column, this can be set in pixels or as a percentage of total table width (if not set the system will determine the best)
+    ; minWidth - sets the minimum width of this column, this should be set in pixels (this takes priority over the global option of columnMinWidth)
+    ; widthGrow New - when using fitColumns layout mode, determines how much the column should grow to fill available space (see Table Layout for more details)
+    ; widthShrink New - when using fitColumns layout mode, determines how much the column should shrink to fit available space (see Table Layout for more details)
+    ; resizable New - set whether column can be resized by user dragging its edges (see Table Layout for more details)
+    ; frozen - freezes the column in place when scrolling (see Frozen Columns for more details)
+    ; responsive - an integer to determine when the column should be hidden in responsive mode (see Responsive Layout for more details)
+    ; tooltip - sets the on hover tooltip for each cell in this column (see Formatting Data for more details)
+    ; cssClass - sets css classes on header and cells in this column. (value should be a string containing space seperated class names)
+    ; rowHandle - sets the column as a row handle, allowing it to be used to drag movable rows. (see Movable Rows for more details)
+    ; hideInHtml - When the getHtml function is called, hide the column from the output.
+    
+    align.s
+    width.i
+    minWidth.i
+    ;     widthGrow.i
+    ;     widthShrink.i
+    resizable.i
+    frozen.i
+    ;     responsive.i
+    tooltip.s
+    cssClass.s
+    ;     rowHandle.i
+    ;     hideInHtml.i
+    
+    ; Data Manipulation
+    
+    ; sorter - determines how to sort data in this column (see Sorting Data for more details)
+    ; sorterParams - additional parameters you can pass to the sorter(see Sorting Data for more details)
+    ; formatter - set how you would like the data to be formatted (see Formatting Data for more details)
+    ; formatterParams - additional parameters you can pass to the formatter(see Formatting Data for more details)
+    ; variableHeight -alter the row height to fit the contents of the cell instead of hiding overflow
+    ; editable - callback to check if the cell is editable (see Manipulating Data for more details)
+    ; editor - set the editor to be used when editing the data. (see Manipulating Data for more details)
+    ; editorParams - additional parameters you can pass to the editor (see Manipulating Data for more details)
+    ; validator - set the validator to be used to approve data when a user edits a cell. (see Manipulating Data for more details)
+    ; mutator - function for manipulating column values as they are parsed into the table (see Mutators for more details)
+    ; mutatorParams - additional parameters you can pass to the mutator(see Mutators for more details)
+    ; mutatorData New - function for manipulating column values as they are parsed into the table by command (see Mutators for more details)
+    ; mutatorDataParams New - additional parameters you can pass to the mutatorData(see Mutators for more details)
+    ; mutatorEdit New - function for manipulating column values as they are edited by a user (see Mutators for more details)
+    ; mutatorEditParams New - additional parameters you can pass to the mutatorEdit(see Mutators for more details)
+    ; mutatorClipboard New - function for manipulating column values as they are pasted by a user (see Mutators for more details)
+    ; mutatorClipboardParams New - additional parameters you can pass to the mutatorClipboard(see Mutators for more details)
+    ; accessor - function to alter column values before they are extracted from the table function (see Accessors for more details)
+    ; accessorParams - additional parameters you can pass to the accessor(see Accessors for more details)
+    ; accessorData New - function to alter column values before they are extracted from the table using the getData function (see Accessors for more details)
+    ; accessorDataParams New - additional parameters you can pass to the accessorData(see Accessors for more details)
+    ; accessorDownload New - function to alter column values before they are included in a file download (see Accessors for more details)
+    ; accessorDownloadParams New - additional parameters you can pass to the accessorDownload(see Accessors for more details)
+    ; accessorClipboard New - function to alter column values before they are copied to the clipboard (see Accessors for more details)
+    ; accessorClipboardParams New - additional parameters you can pass to the accessorClipboard(see Accessors for more details)
+    ; download - show or hide column in downloaded data (see Downloading Table Data for more details)
+    ; downloadTitle - set custom title for column in download (see Downloading Table Data for more details)
+    ; topCalc - the column calculation to be displayed at the top of this column(see Column Calculations for more details)
+    ; topCalcParams - additional parameters you can pass to the topCalc calculation function (see Column Calculations for more details)
+    ; topCalcFormatter - formatter for the topCalc calculation cell(see Column Calculations for more details)
+    ; topCalcFormatterParams - additional parameters you can pass to the topCalcFormatter function(see Column Calculations for more details)
+    ; bottomCalc - the column calculation to be displayed at the bottom of this column(see Column Calculations for more details)
+    ; bottomCalcParams - additional parameters you can pass to the bottomCalc calculation function(see Column Calculations for more details)
+    ; bottomCalcFormatter - formatter for the bottomCalc calculation cell(see Column Calculations for more details)
+    ; bottomCalcFormatterParams - additional parameters you can pass to the bottomCalcFormatter function(see Column Calculations for more details)
+    
+    sorter.s
+    ;     sorterParams.i
+    formatter.s
+    formatterParams.s
+    ;     variableHeight.i
+    ;     editable.i
+    ;     editor.i
+    ;     editorParams.i
+    ;     validator.i
+    ;     mutator.i
+    ;     mutatorParams.i
+    ;     mutatorData.i
+    ;     mutatorDataParams.i
+    ;     mutatorEdit.i
+    ;     mutatorEditParams.i
+    ;     mutatorClipboard.i
+    ;     mutatorClipboardParams.i
+    ;     accessor.i
+    ;     accessorParams.i
+    ;     accessorData.i
+    ;     accessorDataParams.i
+    ;     accessorDownload.i
+    ;     accessorDownloadParams.i
+    ;     accessorClipboard.i
+    ;     accessorClipboardParams.i
+    ;     download.i
+    ;     downloadTitle.i
+    ;     topCalc.i
+    ;     topCalcParams.i
+    ;     topCalcFormatter.i
+    ;     topCalcFormatterParams.i
+    ;     bottomCalc.i
+    ;     bottomCalcParams.i
+    ;     bottomCalcFormatter.i
+    ;     bottomCalcFormatterParams.i
+    
+    ; Cell Events
+    
+    ; cellClick - callback for when user clicks on a cell in this column (see Callbacks for more details)
+    ; cellDblClick - callback for when user double clicks on a cell in this column (see Callbacks for more details)
+    ; cellContext - callback for when user right clicks on a cell in this column (see Callbacks for more details)
+    ; cellTap - callback for when user taps on a cell in this column, triggered in touch displays. (see Callbacks for more details)
+    ; cellDblTap - callback for when user double taps on a cell in this column, triggered in touch displays when a user taps the same cell twice in under 300ms. (see Callbacks for more details)
+    ; cellTapHold - callback for when user taps and holds on a cell in this column, triggered in touch displays when a user taps and holds the same cell for 1 second. (see Callbacks for more details)
+    ; cellEditing - callback for when a cell in this column is being edited by the user (see Callbacks for more details)
+    ; cellEdited - callback for when a cell in this column has been edited by the user (see Callbacks for more details)
+    ; cellEditCancelled - callback for when an edit on a cell in this column is aborted by the user (see Callbacks for more details)
+    
+    ;     cellClick.i
+    ;     cellDblClick.i
+    ;     cellContext.i
+    ;     cellTap.i
+    ;     cellDblTap.i
+    ;     cellTapHold.i
+    ;     cellEditing.i
+    ;     cellEdited.i
+    ;     cellEditCancelled.i
+    
+    ; Column Headers
+    
+    ; headerSort - user can sort by clicking on the header (see Sorting Data for more details)
+    ; headerSortStartingDir New - set the starting sort direction when a user first clicks on a header (see Sorting Data for more details)
+    ; headerClick - callback for when user clicks on the header for this column (see Callbacks for more details)
+    ; headerDblClick - callback for when user double clicks on the header for this column (see Callbacks for more details)
+    ; headerContext - callback for when user right clicks on the header for this column (see Callbacks for more details)
+    ; headerTap - callback for when user taps on a header for this column, triggered in touch displays. (see Callbacks for more details)
+    ; headerDblTap - callback for when user double taps on a header for this column, triggered in touch displays when a user taps the same header twice in under 300ms. (see Callbacks for more details)
+    ; headerTapHold - callback for when user taps and holds on a header for this column, triggered in touch displays when a user taps and holds the same header for 1 second. (see Callbacks for more details)
+    ; headerTooltip - sets the on hover tooltip for the column header (see Formatting Data for more details)
+    ; editableTitle - allows the user to edit the header titles. (see Editable Column Titles for more details)
+    ; titleFormatter - formatter function for header title (see Formatting Data for more details)
+    ; titleFormatterParams - additional parameters you can pass to the header title formatter(see Formatting Data for more details)
+    ; headerFilter - filtering of columns from elements in the header (see Header Filtering for more details)
+    ; headerFilterPlaceholder - placeholder text for the header filter (see Header Filtering for more details)
+    ; headerFilterParams - additional parameters you can pass to the header filter (see Header Filtering for more details)
+    ; headerFilterFunc - the filter function that should be used by the header filter (see Header Filtering for more details)
+    ; headerFilterFuncParams - additional parameters object passed to the headerFilterFunc function (see Header Filtering for more details)    
+    
+    ;     headerSort.i
+    ;     headerSortStartingDir.i
+    ;     headerClick.i
+    ;     headerDblClick.i
+    ;     headerContext.i
+    ;     headerTap.i
+    ;     headerDblTap.i
+    ;     headerTapHold.i
+    ;     headerTooltip.i
+    ;     editableTitle.i
+    ;     titleFormatter.i
+    ;     titleFormatterParams.i
+    ;     headerFilter.i
+    ;     headerFilterPlaceholder.i
+    ;     headerFilterParams.i
+    ;     headerFilterFunc.i
+    ;     headerFilterFuncParams.i
+    
+  EndStructure
+  
+  #Style_Tabulator          = "tabulator.min.css"
+  #Style_Tabulator_Midnight = "tabulator_midnight.min.css"
+  #Style_Tabulator_Modern   = "tabulator_modern.min.css"
+  #Style_Tabulator_Simple   = "tabulator_simple.min.css"
+  #Style_Tabulator_Site     = "tabulator_site.min.css"
+  #Style_Bootstrap          = "bootstrap/tabulator_bootstrap.min.css"
+  #Style_SemanticUI         = "semantic-ui/tabulator_semantic-ui.min.css"
+  
+  #Sorter_String   = "string"
+  #Sorter_Number   = "number"
+  #Sorter_AlphaNum = "alphanum"
+  #Sorter_Date     = "date"
+  #Sorter_Time     = "time"
+  #Sorter_DateTime = "datetime"
+  #Sorter_Array    = "array"
+  
+  #Formatter_PlainText   = "plaintext"     ; plaintext - This is the default formatter for all cells, and simply displays the value of the cell as text.
+  #Formatter_TextArea    = "textarea"      ; textarea - shows text with carriage returns intact (great for multiline text), this formatter will also adjust the height of rows to fit the cells contents when columns are resized
+  #Formatter_Html        = "html"          ; html - displays un-sanitized html
+  #Formatter_Money       = "money"         ; money - formats a number into currency notation (eg. 1234567.8901 -> 1,234,567.89)
+  #Formatter_Image       = "image"         ; image - creates an img element wirh the src set as the value. (triggers the normalizeHeight function on the row on image load)
+  #Formatter_Link        = "link"          ; link - renders data as an anchor with a link to the given value (by default the value will be used as both the url and the label of the tag)
+  #Formatter_Tick        = "tick"          ; tick - displays a green tick if the value is (true|'true'|'True'|1) and an empty cell if not
+  #Formatter_TickCross   = "tickCross"     ; tickCross - displays a green tick if the value is (true|'true'|'True'|1) and a red cross if not
+  #Formatter_Color       = "color"         ; color - sets the background colour of the cell to the value. Can be any valid CSS color eg. #ff0000, #f00, rgb(255,0,0), red, rgba(255,0,0,0), hsl(0, 100%, 50%)
+  #Formatter_Star        = "star"          ; star - displays a graphical star rating based on integer values
+  #Formatter_Progress    = "progress"      ; progress Updated - displays a progress bar that fills the cell from left to right, using values 0-100 as a percentage of width
+  #Formatter_Lookup      = "lookup"        ; lookup - looks up the value to display from a object passed into the formatterParams property, if not present it displays the current cell value
+  #Formatter_ButtonTick  = "buttonTick"    ; buttonTick - displays a tick icon on each row (for use as a button)
+  #Formatter_ButtonCross = "buttonCross"   ; buttonCross - displays a cross icon on each row (for use as a button)
+  #Formatter_RowNum      = "rownum"        ; rownum - shows an incrementing row number for each row.
+  #Formatter_Handle      = "handle"        ; handle - fills the cell with hamburger bars, to be used as a row handle  
+  
+  #Align_Left   = "left"
+  #Align_Center = "center"
+  #Align_Right  = "right"
+  
+  Global IsInitialized
+  
+  Declare Init(Callback, Style.s = #Style_Tabulator)
+  Declare BindGadget(Gadget, Options)
+  Declare BindTabulatorEvent(Gadget, Callback, EventType.q = #PB_All)
+  Declare UnbindTabulatorEvent(Gadget, Callback, EventType.q = #PB_All)
+  Declare GetSelectedData(Gadget)
+  Declare GetSelectedRows(Gadget)
+  Declare Redraw(Gadget)
+  
+  Declare GetAttribute(Gadget, Attribute)
+  Declare SetAttribute(Gadget, Attribute, Value)
+  Declare SetAttribute2(Gadget, Attribute, List Value())
+  Declare ClearItems(Gadget)
+  
+  Declare InitColumn(*Column.sColumn)
+  
 EndDeclareModule
 
 Module Tabulator
-	
-	Macro GetSelector
-		!	var selector = $(spider_GadgetID(v_gadget).div).find('.dijitContentPane');
-	EndMacro
-	
-	Procedure Init(Callback, Style.s = #Style_Tabulator)
-		
-		! $('<link rel="stylesheet" type="text/css">').attr('href','resources/tabulator/css/' + v_style).appendTo('head');
-		
-		; Other styles: take a lot into resources\tabulator\css
-		
-		! require(["./resources/tabulator/js/jquery-ui.min.js"], function() { 
-		!   require(["./resources/tabulator/js/tabulator.min.js"], function() {
-		
-		IsInitialized = #True
-		
-    ! $.widget("ui.tabulator", $.ui.tabulator, {
-    !     options: {
-    !         resizableColumns:true,
-    !         height: '100%'
-    !     },
-    ! });		
-		
-		!     v_callback();
-		!   });
-		! });
-		
-		
-	EndProcedure  
-	
-	Procedure BindGadget(Gadget, Options)
-	  
-		GetSelector
-		
-		! selector.tabulator(v_options);
-		
-		Redraw(Gadget)
-	  
-	EndProcedure
-	
-	Procedure SetAttribute(Gadget, Attribute, Value)
-	  
-	  GetSelector
-	  
-	  Select Attribute
-	      
-	    Case #TabulatorData
-	      ! selector.tabulator("setData", v_value);
-	      
-	    Case #TabulatorColumns
-	      ! selector.tabulator("setColumns", v_value);
-	      
-	      ;	Case #TabulatorOptions
-        ;		! var oldOptions = selector.tabulator("option");
-        ;		! var newOptions = {};
-        ;		! $.extend(true, newOptions, oldOptions, v_value) 
-        ;		! selector.tabulator("option", newOptions);
-	      
-	  EndSelect
-	  
-	  Redraw(Gadget)
-	  
-	EndProcedure
-	
-	Procedure GetAttribute(Gadget, Attribute)
-	  
-	  GetSelector
-	  
-	  Select Attribute
-	      
-	    Case #TabulatorData
-	      ! return selector.tabulator("getData");
-	      
-	    Case #TabulatorColumns
-	      ! return selector.tabulator("getColumns");
-	      
-	  EndSelect
-	  
-	EndProcedure	
-	
-	Procedure ClearItems(Gadget)
-		
-		GetSelector
-		
-		! selector.tabulator("clear");
-		
-		Redraw(Gadget)
-		
-	EndProcedure
-	
-	Procedure Redraw(Gadget)
-		
-		GetSelector
-		
-		! selector.tabulator("redraw", true);    
-		
-	EndProcedure
-	
+  
+  Macro GetSelector
+    !	var selector = $(spider_GadgetID(v_gadget).div).find('.dijitContentPane');
+  EndMacro
+  
+  Procedure Init(Callback, Style.s = #Style_Tabulator)
+    
+    ! $('<link rel="stylesheet" type="text/css">').attr('href','./resources/tabulator/css/' + v_style).appendTo('head');
+    
+    ! require(["./resources/tabulator/js/jquery-ui.min.js"], function() {
+    !   require(["./resources/tabulator/js/jquery.sparkline.min.js"], function() {
+    !     require(["./resources/tabulator/js/tabulator.min.js"], function() {
+    
+    IsInitialized = #True
+    
+    !       $.widget("ui.tabulator", $.ui.tabulator, {
+    !         options: {
+    !           resizableColumns: true,
+    !           selectable: 1,
+    !           height: '100%'
+    !         }
+    !       });
+    
+    !       v_callback();
+    
+    !     });
+    !   });
+    ! });
+        
+  EndProcedure
+  
+  Procedure InitColumn(*Column.sColumn)
+    
+    ; init this column with default-values
+    
+    *Column\visible = #True
+    *Column\resizable = #True
+    *Column\align = #Align_Left
+    
+    ProcedureReturn *Column
+    
+  EndProcedure
+  
+  Procedure BindGadget(Gadget, Options)
+    
+    GetSelector
+    
+    Protected eType.q
+    
+    ; #############################
+    ; Table Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Table Building
+    ; When a the tabulator constructor is called, the tableBuilding callback will triggered:
+    
+    ! v_options.tableBuilding = function() {
+    !   if (typeof selector.data("tableBuilding") == 'function') {
+    eType = #EventType_TableBuilding
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("tableBuilding")();
+    !   }
+    ! };
+    
+    ; Table Built
+    ; When a the tabulator constructor is called and the table has finished being rendered, the tableBuilt callback will triggered:
+    
+    ! v_options.tableBuilt = function() {
+    !   if (typeof selector.data("tableBuilt") == 'function') {
+    eType = #EventType_TableBuilt
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("tableBuilt")();
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Column Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Column Header Click
+    ; The headerClick callback is triggered when a user left clicks on a column or group header, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; column - column component
+    
+    ! // {title:"Name", field:"name", headerClick:function(e, column) { }, };
+    
+    ; Column Header Double Click
+    ; The headerDblClick callback is triggered when a user double clicks on a column or group header, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; column - column component
+    
+    ! // {title:"Name", field:"name", headerDblClick:function(e, column) { }, };
+    
+    ; Column Header Right Click
+    ; The headerContext callback is triggered when a user right clicks on a column or group header, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; column - column component
+    
+    ! // {title:"Name", field:"name", headerContext:function(e, column) { },  }; 
+    
+    ; Column Moved
+    ; The columnMoved callback will be triggered when a column has been successfully moved.
+    ; column - column component of the moved column
+    ; columns- array of columns in new order
+    
+    ! v_options.columnMoved = function(column, columns) {
+    !   if (typeof selector.data("columnMoved") == 'function') {
+    eType = #EventType_ColumnMoved
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("columnMoved")({ column:column, columns:columns });
+    !   }
+    ! };
+    
+    ; Column Resized
+    ; The columnResized callback will be triggered when a column has been resized by the user.
+    ; column - column component of the resized column
+    
+    ! v_options.columnResized = function(column) {
+    !   if (typeof selector.data("columnResized") == 'function') {
+    eType = #EventType_ColumnResized
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("columnResized")({ column:column });
+    !   }
+    ! };
+    
+    ; Column Visibility Changed
+    ; The columnVisibilityChanged callback is triggered whenever a column changes between hidden and visible states.
+    ; column - column component
+    ; visible - is column visible (true = visible, false = hidden)
+    
+    ! v_options.columnVisibilityChanged = function(column, visible) {
+    !   if (typeof selector.data("columnVisibilityChanged") == 'function') {
+    eType = #EventType_ColumnVisibilityChanged
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("columnVisibilityChanged")({ column:column, visible:visible });
+    !   }
+    ! };
+    
+    ; Column Title Changed
+    ; The columnTitleChanged callback is triggered whenever a user edits a column title when the editableTitle parameter has been enabled in the column definition array.
+    ; column - column component
+    
+    ! v_options.columnTitleChanged = function(column) {
+    !   if (typeof selector.data("columnTitleChanged") == 'function') {
+    eType = #EventType_ColumnTitleChanged
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("columnTitleChanged")({ column:column });
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Row Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Row Click
+    ; The rowClick callback is triggered when a user clicks on a row.
+    ; e - the click event object
+    ; row - row component
+    ! v_options.rowClick = function(e, row) {
+    !   if (typeof selector.data("rowClick") == 'function') {
+    eType = #EventType_RowClick
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowClick")({ e:e, row:row });
+    !   }
+    ! };
+    
+    ; Row Double Click
+    ; The rowDblClick callback is triggered when a user double clicks on a row.
+    ; e - the click event object
+    ; row - row component
+    
+    ! v_options.rowDblClick = function(e, row) {
+    !   if (typeof selector.data("rowDblClick") == 'function') {
+    eType = #EventType_RowDblClick
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowDblClick")({ e: e, row: row });
+    !   }
+    ! };
+    
+    ; Row Context Menu
+    ; The rowContext callback is triggered when a user right clicks on a row.
+    ; If you want to prevent the browsers context menu being triggered in this event you will need to include the preventDefault() function in your callback.
+    ; e - the click event object
+    ; row - row component
+    
+    ! v_options.rowContext = function(e, row) {
+    !   if (typeof selector.data("rowContext") == 'function') {
+    eType = #EventType_RowContext
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowContext")({ e: e, row: row });
+    !   }
+    !   e.preventDefault(); // prevent the browsers default context menu form appearing.
+    ! };
+    
+    ; Row Added
+    ; The rowAdded callback is triggered when a row is added to the table by the addRow and updateOrAddRow functions.
+    ; row - row component
+    
+    ! v_options.rowAdded = function(row) {
+    !   if (typeof selector.data("rowAdded") == 'function') {
+    eType = #EventType_RowAdded
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowAdded")({ row: row });
+    !   }
+    ! };
+    
+    ; Row Updated
+    ; The rowUpdated callback is triggered when a row is updated by the updateRow, updateOrAddRow, updateData or updateOrAddData, functions.
+    ; row - row component
+    
+    ! v_options.rowUpdated = function(row) {
+    !   if (typeof selector.data("rowUpdated") == 'function') {
+    eType = #EventType_RowUpdated
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowUpdated")({ row: row });
+    !   }
+    ! };
+    
+    ; Row Deleted
+    ; The rowDeleted callback is triggered when a row is deleted from the table by the deleteRow function.
+    ; row - row component
+    
+    ! v_options.rowDeleted = function(row) {
+    !   if (typeof selector.data("rowDeleted") == 'function') {
+    eType = #EventType_RowDeleted
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowDeleted")({ row: row });
+    !   }
+    ! };
+    
+    ; Row Moved
+    ; The rowMoved callback will be triggered when a row has been successfully moved.
+    ; row - row component
+    
+    ! v_options.rowMoved = function(row) {
+    !   if (typeof selector.data("rowMoved") == 'function') {
+    eType = #EventType_RowMoved
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowMoved")({ row: row });
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Cell Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Cell Click
+    ; The cellClick callback is triggered when a user left clicks on a cell, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; cell - cell component
+    
+    ! // {title:"Name", field:"name", cellClick = function(e, cell) { }, };
+    
+    ; Cell Double Click
+    ; The cellDblClick callback is triggered when a user double clicks on a cell, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; cell - cell component
+    
+    ! // {title:"Name", field:"name", cellDblClick = function(e, cell) { }, };
+    
+    ; Cell Right Click
+    ; The cellContext callback is triggered when a user right clicks on a cell, it can be set on a per column basis using the option in the columns data.
+    ; e - the click event object
+    ; cell - cell component
+    
+    ! // {title:"Name", field:"name", cellContext = function(e, cell) { }, };
+    
+    ; Cell Editing
+    ; The cellEditing callback is triggered when a user starts editing a cell.
+    ; cell - cell component
+    
+    ! v_options.cellEditing = function(cell) {
+    !   if (typeof selector.data("cellEditing") == 'function') {
+    eType = #EventType_CellEditing
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("cellEditing")({ cell:cell });
+    !   }
+    ! };
+    
+    ; Cell Edit Cancelled
+    ; The cellEditCancelled callback is triggered when a user aborts a cell edit and the cancel function is called.
+    ; cell - cell component
+    
+    ! v_options.cellEditCancelled = function(cell) {
+    !   if (typeof selector.data("cellEditCancelled") == 'function') {
+    eType = #EventType_CellEditCancelled
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("cellEditCancelled")({ cell:cell });
+    !   }
+    ! };
+    
+    ; Cell Edited
+    ; The cellEdited callback is triggered when data in an editable cell is changed.
+    ; cell - cell component
+    
+    ! v_options.cellEdited = function(cell) {
+    !   if (typeof selector.data("cellEdited") == 'function') {
+    eType = #EventType_CellEdited
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("cellEdited")({ cell:cell });
+    !   }
+    ! };    
+    
+    ;}-
+    
+    ; #############################
+    ; Data Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Data Loading
+    ; The dataLoading callback is triggered whenever new data is loaded into the table.
+    ; data - the data loading into the table
+    
+    ! v_options.dataLoading = function(data) {
+    !   if (typeof selector.data("dataLoading") == 'function') {
+    eType = #EventType_DataLoading
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataLoading")({ data:data });
+    !   }
+    ! };
+    
+    ; Data Loaded
+    ; The dataLoaded callback is triggered when a new set of data is loaded into the table.
+    ; data - all data loaded into the table
+    
+    ! v_options.dataLoaded = function(data) {
+    !   if (typeof selector.data("dataLoaded") == 'function') {
+    eType = #EventType_DataLoaded
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataLoaded")({ data:data });
+    !   }
+    ! };
+    
+    ; Data Edited
+    ; The dataEdited callback is triggered whenever the table data is changed by the user. Triggers for this include editing any cell in the table, adding a row and deleting a row.
+    ; data - the updated table data
+    
+    ! v_options.dataEdited = function(data) {
+    !   if (typeof selector.data("dataEdited") == 'function') {
+    eType = #EventType_DataEdited
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataEdited")({ data:data });
+    !   }
+    ! };
+    
+    ; HTML Importing
+    ; The htmlImporting callback is triggered when Tabulator starts importing data from an HTML table.
+    
+    ! v_options.htmlImporting = function() {
+    !   if (typeof selector.data("htmlImporting") == 'function') {
+    eType = #EventType_HTMLImporting
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("htmlImporting")();
+    !   }
+    ! };
+    
+    ; HTML Imported
+    ; The htmlImported callback is triggered when Tabulator finishes importing data from an HTML table.
+    
+    ! v_options.htmlImported = function() {
+    !   if (typeof selector.data("htmlImported") == 'function') {
+    eType = #EventType_HTMLImported
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("htmlImported")();
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Ajax Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Ajax Request
+    ; The ajaxRequesting callback is triggered when ever an ajax request is made.
+    ; url - the URL of the request
+    ; params - the parameters passed with the request
+    
+    ! v_options.ajaxRequesting = function(url, params) {
+    !   if (typeof selector.data("ajaxRequesting") == 'function') {
+    eType = #EventType_AjaxRequest
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("ajaxRequesting")( { url:url, params:params } );
+    !   }
+    ! };
+    
+    ; Ajax Response
+    ; The ajaxResponse callback is triggered when a successful ajax request has been made. This callback can also be used to modify the received data before it is parsed by the table.
+    ; If you use this callback it must return the data to be parsed by Tabulator, otherwise no data will be rendered.
+    ; url - the URL of the request
+    ; params - the parameters passed with the request
+    ; response - the JSON object returned in the body of the response.
+    
+    ! v_options.ajaxResponse = function(url, params, response) {
+    !   if (typeof selector.data("ajaxResponse") == 'function') {
+    eType = #EventType_AjaxResponse
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("ajaxResponse")( { url:url, params:params, response:response } );
+    !   }
+    !   return response; //return the response data to tabulator
+    ! };
+    
+    ; Ajax Error
+    ; The ajaxError callback is triggered there is an error response to an ajax request.
+    ; xhr - the XHR object
+    ; textStatus - error type
+    ; errorThrown - text portion of the HTTP status
+    
+    ! v_options.ajaxError = function(xhr, textStatus, errorThrown) {
+    !   if (typeof selector.data("ajaxError") == 'function') {
+    eType = #EventType_AjaxError
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("ajaxError")( { xhr:xhr, textStatus:textStatus, errorThrown:errorThrown } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Filter Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Data Filtering
+    ; The dataFiltering callback is triggered whenever a filter event occurs, before the filter happens.
+    ; filters - array of filters currently applied
+    
+    ! v_options.dataFiltering = function(filters) {
+    !   if (typeof selector.data("dataFiltering") == 'function') {
+    eType = #EventType_DataFiltering
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataFiltering")( { filters:filters } );
+    !   }
+    ! };
+    
+    ; Data Filtered
+    ; The dataFiltered callback is triggered after the table dataset is filtered.
+    ; filters - array of filters currently applied
+    ; rows - array of row components that pass the filters
+    
+    ! v_options.dataFiltered = function(filters, rows) {
+    !   if (typeof selector.data("dataFiltered") == 'function') {
+    eType = #EventType_DataFiltered
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataFiltered")( { filters:filters, rows:rows } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Sorting Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Data Sorting
+    ; The dataSorting callback is triggered whenever a sort event occurs, before sorting happens.
+    ; sorters - an array of the sorters currently applied
+    
+    ! v_options.dataSorting = function(sorters) {
+    !   if (typeof selector.data("dataSorting") == 'function') {
+    eType = #EventType_DataSorting
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataSorting")( { sorters:sorters } );
+    !   }
+    ! };
+    
+    ; Data Sorted
+    ; The dataSorted callback is triggered after the table dataset is sorted.
+    ; sorters - array of the sorters currently applied
+    ; rows - array of row components in their new order
+    
+    ! v_options.dataSorted = function(sorters, rows) {
+    !   if (typeof selector.data("dataSorted") == 'function') {
+    eType = #EventType_DataSorted
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataSorted")( { sorters:sorters, rows:rows } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Layout Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Render Started
+    ; The renderStarted callback is triggered whenever all the rows in the table are about to be rendered. This can include:
+    ; 
+    ; Data is loaded into the table when setData is called
+    ; A page is loaded through any form of pagination
+    ; Rows are added to the table during progressive rendering
+    ; Columns are changed by setColumns
+    ; The data is filtered
+    ; The data is sorted
+    ; The redraw function is called
+    
+    ! v_options.renderStarted = function() {
+    !   if (typeof selector.data("renderStarted") == 'function') {
+    eType = #EventType_RenderStarted
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("renderStarted")();
+    !   }
+    ! };
+    
+    ; Render Complete
+    ; The renderComplete callback is triggered after the table has been rendered
+    
+    ! v_options.renderComplete = function() {
+    !   if (typeof selector.data("renderComplete") == 'function') {
+    eType = #EventType_RenderComplete
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("renderComplete")();
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Pagination Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Page Loaded
+    ; Whenever a page has been loaded, the pageLoaded callback is called, passing the current page number as an argument.
+    ; pageno - the number of the loaded page
+    
+    ! v_options.pageLoaded = function(pageno) {
+    !   if (typeof selector.data("pageLoaded") == 'function') {
+    eType = #EventType_PageLoaded
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("pageLoaded")( { pageno:pageno } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Localization Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Table Localized
+    ; When a localization event has occured, the localized callback will triggered, passing the current locale code and language object:
+    ; locale - a string representing the current locale
+    ; lang - the language object for the current locale
+    
+    ! v_options.localized = function(locale, lang) {
+    !   if (typeof selector.data("localized") == 'function') {
+    eType = #EventType_TableLocalized
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("localized")( { locale:locale, lang:lang } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Group Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Data Grouping
+    ; The dataGrouping callback is triggered whenever a data grouping event occurs, before grouping happens.
+    
+    ! v_options.dataGrouping = function() {
+    !   if (typeof selector.data("dataGrouping") == 'function') {
+    eType = #EventType_DataGrouping
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("dataGrouping")();
+    !   }
+    ! };
+    
+    ; ; buggy (in combination with dojo?):
+    ; ; Data Grouped
+    ; ; The dataGrouped callback is triggered whenever a data grouping event occurs, after grouping happens.
+    ; ; groups - array of group components
+    ;
+    ; ! v_options.dataGrouped = function(groups) {
+    ; !   if (typeof selector.data("dataGrouped") == 'function') {
+    ; eType = #EventType_DataGrouped
+    ; !     spider.event.eventObject = v_gadget;
+    ; !     spider.event.eventType = v_etype;
+    ; !     selector.data("dataGrouped")( { groups:groups } );
+    ; !   }
+    ; ! };
+    
+    ; Group Visibility Changed
+    ; The groupVisibilityChanged callback is triggered whenever a group changes between hidden and visible states.
+    ; group - group component
+    ; visible - is group visible (true = visible, false = hidden)
+    
+    ! v_options.groupVisibilityChanged = function(group, visible) {
+    !   if (typeof selector.data("groupVisibilityChanged") == 'function') {
+    eType = #EventType_GroupVisibilityChanged
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("groupVisibilityChanged")( { group:group, visible:visible } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; #############################
+    ; Selection Callbacks
+    ; #############################
+    
+    ;{-
+    
+    ; Row Selected
+    ; The rowSelected event is triggered when a row is selected, either by the user or programatically.
+    ; row - row component for the selected row
+    
+    ! v_options.rowSelected = function(row) {
+    !   if (typeof selector.data("rowSelected") == 'function') {
+    eType = #EventType_RowSelected
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowSelected")( { row:row } );
+    !   }
+    ! };
+    
+    ; Row Deselected
+    ; The rowDeselected event is triggered when a row is deselected, either by the user or programatically.
+    ; row - row component for the deselected row
+    
+    ! v_options.rowDeselected = function(row) {
+    !   if (typeof selector.data("rowDeselected") == 'function') {
+    eType = #EventType_RowDeselected
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowDeselected")( { row:row } );
+    !   }
+    ! };
+    
+    ; Row Selection Changed
+    ; Whenever the number of selected rows changes, through selection or deselection, the rowSelectionChanged event is triggered.
+    ; This passes an array of the data objects for each row in the order they were selected as the first argument, and an array of jQuery elements for each of the rows in order of selection as the second argument.
+    ; rows - array of row components for the selected rows in order of selection
+    ; data - array of data objects for the selected rows in order of selection
+    
+    ! v_options.rowSelectionChanged = function(data, rows) {
+    !   if (typeof selector.data("rowSelectionChanged") == 'function') {
+    eType = #EventType_RowSelectionChanged
+    !     spider.event.eventObject = v_gadget;
+    !     spider.event.eventType = v_etype;
+    !     selector.data("rowSelectionChanged")( { data:data, rows:rows } );
+    !   }
+    ! };
+    
+    ;}-
+    
+    ; ------------------------------------------------------------------
+    
+    ! selector.tabulator(v_options);
+    
+    ! spider.DojoAspect.after(dijit.byId(spider_GadgetID(v_gadget).gadget.id), "resize", function() {
+    Redraw(Gadget)
+    ! });
+    
+    Redraw(Gadget)
+    
+  EndProcedure
+  
+  Procedure GetAttribute(Gadget, Attribute)
+    GetSelector
+    Select Attribute
+      Case #TabulatorData
+        ! return selector.tabulator("getData");
+      Case #TabulatorColumns
+        ! return selector.tabulator("getColumns");
+    EndSelect
+  EndProcedure
+  Procedure SetAttribute(Gadget, Attribute, Value)
+    GetSelector
+    Select Attribute
+      Case #TabulatorData
+        ! selector.tabulator("setData", v_value);
+      Case #TabulatorColumns
+        ! selector.tabulator("setColumns", v_value);
+    EndSelect
+    Redraw(Gadget)
+  EndProcedure
+  
+  Procedure SetAttribute2(Gadget, Attribute, List Value.sColumn())
+    GetSelector
+    Select Attribute
+      Case #TabulatorData
+      Case #TabulatorColumns
+        
+        If CreateJSON(0)
+          
+          InsertJSONList(JSONValue(0), Value())
+          
+          Protected sJ.s = ComposeJSON(0)
+          
+          ! var v_oj = JSON.parse(v_sj);
+          
+          ! $.each(v_oj, function( index, item ) {
+          
+          !   if (item.sorter == "") {
+          !     item.sorter = null;
+          !   }
+          
+          !   if (item.formatter2) {
+          !   }
+          
+          !   var itemFormatter = item.formatter.trim();
+          !   if (itemFormatter == "") {
+          !     item.formatter = null;
+          !   } else if (itemFormatter.startsWith("@")) {
+          !     if (itemFormatter.endsWith("()")) {
+          !       itemFormatter = itemFormatter.substring(0, itemFormatter.length - 2)
+          !     }
+          !     item.formatter = window["f_" + itemFormatter.substr(1).toLowerCase()];
+          !   }
+          
+          !   var itemFormatterParams = item.formatterParams.trim();
+          !   if (itemFormatterParams == "") {
+          !     item.formatterParams = null;
+          !   } else {
+          !     item.formatterParams = JSON.parse(item.formatterParams);
+          !   }
+          
+          ! });          
+          
+          ! selector.tabulator("setColumns", v_oj);
+          
+        EndIf        
+        
+        
+    EndSelect
+    Redraw(Gadget)
+  EndProcedure
+    
+  Procedure ClearItems(Gadget)
+    GetSelector
+    ! selector.tabulator("clearData");
+    ! selector.tabulator("redraw", true);
+  EndProcedure
+  
+  Procedure GetSelectedData(Gadget)
+    
+    GetSelector
+    
+    ! return selector.tabulator("getSelectedData"); // get array of currently selected data.
+    
+  EndProcedure
+  
+  Procedure GetSelectedRows(Gadget)
+    
+    GetSelector
+    ! return selector.tabulator("getSelectedRows"); // get array of currently selected row components.
+    
+  EndProcedure
+  
+  Procedure Redraw(Gadget)
+    
+    GetSelector
+    
+    ! selector.tabulator("redraw", true);
+    
+  EndProcedure
+  
+  Procedure BindUnbindTabulatorEvent(Gadget, Callback, EventType.q, Bind)
+    
+    GetSelector
+    
+    If EventType = #PB_All
+      
+      EventType = #EventType_TableBuilding |
+                  #EventType_TableBuilt |
+                  #EventType_ColumnHeaderClick |
+                  #EventType_ColumnHeaderDoubleClick |
+                  #EventType_ColumnHeaderRightClick |
+                  #EventType_ColumnMoved |
+                  #EventType_ColumnResized |
+                  #EventType_ColumnVisibilityChanged |
+                  #EventType_ColumnTitleChanged |
+                  #EventType_RowClick |
+                  #EventType_RowDblClick |
+                  #EventType_RowContext |
+                  #EventType_RowAdded |
+                  #EventType_RowUpdated |
+                  #EventType_RowDeleted |
+                  #EventType_RowMoved |
+                  #EventType_CellClick |
+                  #EventType_CellDoubleClick |
+                  #EventType_CellRightClick |
+                  #EventType_CellEditing |
+                  #EventType_CellEditCancelled |
+                  #EventType_CellEdited |
+                  #EventType_DataLoading |
+                  #EventType_DataLoaded |
+                  #EventType_DataEdited |
+                  #EventType_HTMLImporting |
+                  #EventType_HTMLImported |
+                  #EventType_AjaxRequest |
+                  #EventType_AjaxResponse |
+                  #EventType_AjaxError |
+                  #EventType_DataFiltering |
+                  #EventType_DataFiltered |
+                  #EventType_DataSorting |
+                  #EventType_DataSorted |
+                  #EventType_RenderStarted |
+                  #EventType_RenderComplete |
+                  #EventType_PageLoaded |
+                  #EventType_TableLocalized |
+                  #EventType_DataGrouping |
+                  #EventType_DataGrouped |
+                  #EventType_GroupVisibilityChanged |
+                  #EventType_RowSelected |
+                  #EventType_RowDeselected |
+                  #EventType_RowSelectionChanged      
+    EndIf
+    
+    Protected CB = 0
+    
+    If Bind = #True
+      CB = Callback
+    EndIf
+    
+    ; #############################
+    ; Table Callbacks
+    ; #############################
+    
+    If EventType & #EventType_TableBuilding = #EventType_TableBuilding
+      ! selector.data("tableBuilding", v_cb);
+    EndIf
+    
+    If EventType & #EventType_TableBuilt = #EventType_TableBuilt
+      ! selector.data("tableBuilt", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Column Callbacks
+    ; #############################
+    
+    If EventType & #EventType_ColumnHeaderClick = #EventType_ColumnHeaderClick
+      ! selector.data("columnHeaderClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnHeaderDoubleClick = #EventType_ColumnHeaderDoubleClick
+      ! selector.data("columnHeaderDoubleClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnHeaderRightClick = #EventType_ColumnHeaderRightClick
+      ! selector.data("columnHeaderRightClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnMoved = #EventType_ColumnMoved
+      ! selector.data("columnMoved", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnResized = #EventType_ColumnResized
+      ! selector.data("columnResized", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnVisibilityChanged = #EventType_ColumnVisibilityChanged
+      ! selector.data("columnVisibilityChanged", v_cb);
+    EndIf
+    
+    If EventType & #EventType_ColumnTitleChanged = #EventType_ColumnTitleChanged
+      ! selector.data("columnTitleChanged", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Row Callbacks
+    ; #############################
+    
+    If EventType & #EventType_RowClick = #EventType_RowClick
+      ! selector.data("rowClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowDblClick = #EventType_RowDblClick
+      ! selector.data("rowDblClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowContext = #EventType_RowContext
+      ! selector.data("rowContext", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowAdded = #EventType_RowAdded
+      ! selector.data("rowAdded", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowUpdated = #EventType_RowUpdated
+      ! selector.data("rowUpdated", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowDeleted = #EventType_RowDeleted
+      ! selector.data("rowDeleted", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowMoved = #EventType_RowMoved
+      ! selector.data("rowMoved", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Cell Callbacks
+    ; #############################
+    
+    If EventType & #EventType_CellClick = #EventType_CellClick
+      ! selector.data("cellClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_CellDoubleClick = #EventType_CellDoubleClick
+      ! selector.data("cellDoubleClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_CellRightClick = #EventType_CellRightClick
+      ! selector.data("cellRightClick", v_cb);
+    EndIf
+    
+    If EventType & #EventType_CellEditing = #EventType_CellEditing
+      ! selector.data("cellEditing", v_cb);
+    EndIf
+    
+    If EventType & #EventType_CellEditCancelled = #EventType_CellEditCancelled
+      ! selector.data("cellEditCancelled", v_cb);
+    EndIf
+    
+    If EventType & #EventType_CellEdited = #EventType_CellEdited
+      ! selector.data("cellEdited", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Data Callbacks
+    ; #############################    
+    
+    If EventType & #EventType_DataLoading = #EventType_DataLoading
+      ! selector.data("dataLoading", v_cb);
+    EndIf
+    
+    If EventType & #EventType_DataLoaded = #EventType_DataLoaded
+      ! selector.data("dataLoaded", v_cb);
+    EndIf
+    
+    If EventType & #EventType_DataEdited = #EventType_DataEdited
+      ! selector.data("dataEdited", v_cb);
+    EndIf
+    
+    If EventType & #EventType_HTMLImporting = #EventType_HTMLImporting
+      ! selector.data("htmlImporting", v_cb);
+    EndIf
+    
+    If EventType & #EventType_HTMLImported = #EventType_HTMLImported
+      ! selector.data("htmlImported", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Ajax Callbacks
+    ; #############################    
+    
+    If EventType & #EventType_AjaxRequest = #EventType_AjaxRequest
+      ! selector.data("ajaxRequest", v_cb);
+    EndIf
+    
+    If EventType & #EventType_AjaxResponse = #EventType_AjaxResponse
+      ! selector.data("ajaxResponse", v_cb);
+    EndIf
+    
+    If EventType & #EventType_AjaxError = #EventType_AjaxError
+      ! selector.data("ajaxError", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Filter Callbacks
+    ; #############################    
+    
+    If EventType & #EventType_DataFiltering = #EventType_DataFiltering
+      ! selector.data("dataFiltering", v_cb);
+    EndIf
+    
+    If EventType & #EventType_DataFiltered = #EventType_DataFiltered
+      ! selector.data("dataFiltered", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Sorting Callbacks
+    ; #############################
+    
+    If EventType & #EventType_DataSorting = #EventType_DataSorting
+      ! selector.data("dataSorting", v_cb);
+    EndIf
+    
+    If EventType & #EventType_DataSorted = #EventType_DataSorted
+      ! selector.data("dataSorted", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Layout Callbacks
+    ; #############################
+    
+    If EventType & #EventType_RenderStarted = #EventType_RenderStarted
+      ! selector.data("renderStarted", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RenderComplete = #EventType_RenderComplete
+      ! selector.data("renderComplete", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Pagination Callbacks
+    ; #############################
+    
+    If EventType & #EventType_PageLoaded = #EventType_PageLoaded
+      ! selector.data("pageLoaded", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Localization Callbacks
+    ; #############################    
+    
+    If EventType & #EventType_TableLocalized = #EventType_TableLocalized
+      ! selector.data("localized", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Group Callbacks
+    ; #############################
+    
+    If EventType & #EventType_DataGrouping = #EventType_DataGrouping
+      ! selector.data("dataGrouping", v_cb);
+    EndIf
+    
+    If EventType & #EventType_DataGrouped = #EventType_DataGrouped
+      ! selector.data("dataGrouped", v_cb);
+    EndIf
+    
+    If EventType & #EventType_GroupVisibilityChanged = #EventType_GroupVisibilityChanged
+      ! selector.data("groupVisibilityChanged", v_cb);
+    EndIf
+    
+    ; #############################
+    ; Selection Callbacks
+    ; #############################
+    
+    If EventType & #EventType_RowSelected = #EventType_RowSelected
+      ! selector.data("rowSelected", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowDeselected = #EventType_RowDeselected
+      ! selector.data("rowDeselected", v_cb);
+    EndIf
+    
+    If EventType & #EventType_RowSelectionChanged = #EventType_RowSelectionChanged
+      ! selector.data("rowSelectionChanged", v_cb);
+    EndIf
+    
+  EndProcedure
+  
+  Procedure BindTabulatorEvent(Gadget, Callback, EventType.q = #PB_All)
+    BindUnbindTabulatorEvent(Gadget, Callback, EventType, #True)
+  EndProcedure
+  
+  Procedure UnbindTabulatorEvent(Gadget, Callback, EventType.q = #PB_All)
+    BindUnbindTabulatorEvent(Gadget, Callback, EventType, #False)
+  EndProcedure
+  
 EndModule

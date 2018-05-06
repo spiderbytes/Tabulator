@@ -1,12 +1,12 @@
 ![Tabluator Table](http://olifolkerd.github.io/tabulator/images/tabulator.png)
 
-### Version 3.1 Out Now!
+### Version 3.5 Out Now!
 
 An easy to use interactive table generation plugin for JQuery UI
 
-Full documentation & demos can be found at: [http://olifolkerd.github.io/tabulator](http://olifolkerd.github.io/tabulator)
+Full documentation & demos can be found at: [http://tabulator.info](http://tabulator.info)
 ***
-![Tabluator Table](http://olifolkerd.github.io/tabulator/images/tabulator_table.jpg)
+![Tabluator Table](http://tabulator.info/images/tabulator_table.jpg)
 ***
 Features
 ================================
@@ -14,29 +14,9 @@ Tabulator allows you to create interactive tables in seconds from any HTML Table
 
 Simply include the library and the css in your JQuery UI project and you're away!
 
-Tabulator is packed with useful  features including:
+Tabulator is packed with useful features including:
 
-- Fully CSS styleable
-- Virtual DOM
-- JSON, array or AJAX data loading
-- Column sorting
-- Column Freezing
-- Responsive Layout
-- Pagination
-- Editable cells
-- Data Accessors and Mutators
-- Adding/Deleting rows
-- Custom data formatting
-- Movable rows and columns
-- Persistant Column Layouts (storage of table layout changes between page loads)
-- Grouping Rows
-- Data filtering
-- Resizable columns
-- Auto scaling  to fit data/element
-- Many theming options
-- Custom click and context Events
-- Callbacks at every stage of data processing and rendering
-
+![Tabluator Features](http://olifolkerd.github.io/tabulator/images/featurelist_share.png)
 
 Setup
 ================================
@@ -74,22 +54,21 @@ npm install jquery.tabulator --save
 ### CDNJS
 To access Tabulator directly from the CDNJS CDN servers, include the following two lines at the start of your project, instead of the localy hosted versions:
 ```html
-<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.css" rel="stylesheet">
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.1/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.1/js/tabulator.min.js"></script>
 ```
 
 Coming Soon
 ================================
 Tabulator is actively under development and I plan to have even more useful features implemented soon, including:
 
-- Multi-level row grouping
-- multi dimentional data handling
 - Data Reactivity
 - Custom Row Templates
 - Additional Editors and Formatters
-- Column Calculations
 - Copy to Clipboard
 - Print Styling
 - Drag Rows Between Tables
+- Multi Cell Editing
+- Cell Selection
 
 Get in touch if there are any features you feel Tabulator needs.
